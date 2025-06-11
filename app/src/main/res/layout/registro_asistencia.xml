@@ -7,4 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".RegistroAsistenciaActivity">
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrar Asistencia"
+        tools:layout_editor_absoluteX="117dp"
+        tools:layout_editor_absoluteY="341dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
