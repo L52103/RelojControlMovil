@@ -5,18 +5,66 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".TareasActivity">
 
+    <!-- Título -->
     <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewTitulo"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="No tiene tareas pendientes"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="Tareas Pendientes"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.163" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Lista de tareas -->
+    <LinearLayout
+        android:id="@+id/tareasContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/textViewTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/tarea1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Comprar materiales"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tarea2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Llamar al proveedor"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tarea3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Enviar reporte mensual"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tarea4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Revisar correos"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
