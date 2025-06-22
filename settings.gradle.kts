@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "reloj"
 include(":app")
- 
