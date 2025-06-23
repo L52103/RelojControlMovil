@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("plugin.serialization") version "2.1.21"
-
+    alias(libs.plugins.ksp) // <-- AÑADE ESTA LÍNEA
+    kotlin("plugin.serialization") version "2.1.21" // Ajusta esta versión si es necesario
 }
 
 android {
@@ -55,12 +55,36 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
-    implementation("io.github.jan-tennert.supabase:realtime-kt")
 
-    implementation("io.ktor:ktor-client-android:3.1.3")
+
+    dependencies {
+        // Otras dependencias...
+
+        // Retrofit para manejar las peticiones HTTP
+        implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+
+        // Convertidor JSON con Gson
+        implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+
+            // Dependencias de Ktor Client
+            implementation ("io.ktor:ktor-client-core:2.3.2")
+            implementation ("io.ktor:ktor-client-cio:2.3.2")
+            implementation ("io.ktor:ktor-client-content-negotiation:2.3.2")
+            implementation ("io.ktor:ktor-serialization-kotlinx-json:2.3.2")
+
+            // Dependencia para kotlinx.serialization JSON
+            implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
+            // Dependencia para corrutinas en Android (si aún no la tienes)
+            implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+            // Otras dependencias de tu proyecto (por ejemplo, androidx, material design, etc.)
+            implementation ("androidx.core:core-ktx:1.10.1")
+            implementation ("androidx.appcompat:appcompat:1.6.1")
+            implementation ("com.google.android.material:material:1.9.0")
+
+    }
 
 
 
