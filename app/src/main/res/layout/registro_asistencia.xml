@@ -5,15 +5,56 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegistroAsistenciaActivity">
+    android:padding="16dp"
+    tools:context=".RegistroAsistenciaActivity"
+    android:background="#F5F5F5">
+
+    <!-- Imagen centrada arriba -->
+
+    <!-- Botón de Ingreso -->
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:contentDescription="Logo o imagen representativa"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.153"
+        app:srcCompat="@drawable/img" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Registrar Asistencia"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Ingreso"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/imageView2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="32dp" />
+
+    <!-- Botón de Salida -->
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Salida"
+        android:backgroundTint="#F44336"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/button2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="32dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
