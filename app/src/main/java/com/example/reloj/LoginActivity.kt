@@ -20,20 +20,20 @@ data class LoginRequest(
     val password: String
 )
 
-// Data class para la respuesta del login (asegúrate de que la respuesta de tu API incluya un campo "token")
+// Data class para la respuesta del login
 data class LoginResponse(
     val token: String
 )
 
-// Interfaz de la API para definir el endpoint de login
+// Interfaz del servicio API para definir el endpoint de login
 interface ApiService {
-    @POST("login") // Asegúrate de que este endpoint sea el correcto en tu API
+    @POST("Login")  // Asegúrate de que el endpoint sea correcto (concatenado a la URL base)
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 }
 
-// Objeto singleton que configura la instancia de Retrofit para conectarse a tu API en Azure
+// Objeto singleton para configurar Retrofit y brindar la instancia de ApiService
 object ApiClient {
-    // Cambia la URL base por la de tu API en Azure (debe terminar en "/" para que Retrofit la concatene correctamente)
+    // La URL base de tu API en Azure (debe terminar en "/" para que Retrofit concatene el endpoint correctamente)
     private const val BASE_URL = "https://apilogin.azurewebsites.net/api/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -44,12 +44,12 @@ object ApiClient {
     val apiService: ApiService = retrofit.create(ApiService::class.java)
 }
 
-// Activity para el login usando el endpoint de Azure
+// Activity para el login
 class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Puedes incluir enableEdgeToEdge() y ajustes de insets según precises.
+        // Establece el layout del login (asegúrate de que tu recurso R.layout.login existe y tenga los IDs correctos)
         setContentView(R.layout.login)
 
         // Referencias a los elementos de la UI
@@ -87,7 +87,8 @@ class LoginActivity : AppCompatActivity() {
                             startActivity(Intent(this@LoginActivity, menuActivity::class.java))
                             finish()
                         } else {
-                            Toast.makeText(this@LoginActivity, "Respuesta vacía", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@LoginActivity, "Respuesta vacía", Toast.LENGTH_LONG)
+                                .show()
                         }
                     } else {
                         Toast.makeText(
@@ -107,5 +108,3 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
-
-

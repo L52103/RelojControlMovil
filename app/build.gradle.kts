@@ -68,7 +68,7 @@ dependencies {
 
 
             // Dependencias de Ktor Client
-            implementation ("io.ktor:ktor-client-core:2.3.2")
+            implementation ("io.ktor:ktor-client-core:3.1.3")
             implementation ("io.ktor:ktor-client-cio:2.3.2")
             implementation ("io.ktor:ktor-client-content-negotiation:2.3.2")
             implementation ("io.ktor:ktor-serialization-kotlinx-json:2.3.2")
@@ -77,7 +77,7 @@ dependencies {
             implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
             // Dependencia para corrutinas en Android (si aún no la tienes)
-            implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+            implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
             // Otras dependencias de tu proyecto (por ejemplo, androidx, material design, etc.)
             implementation ("androidx.core:core-ktx:1.10.1")
