@@ -15,7 +15,39 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/messageInputLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+    <!-- Opciones de botones (inicialmente visibles) -->
+    <LinearLayout
+        android:id="@+id/optionsLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/messageInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/option1Button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Necesito ayuda"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp" />
+
+        <Button
+            android:id="@+id/option2Button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Quiero justificar mi inasistencia"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/messageInputLayout"
@@ -35,7 +67,8 @@
             android:layout_height="wrap_content"
             android:hint="Escribe un mensaje"
             android:padding="12dp"
-            android:textColor="#000" />
+            android:textColor="#000"
+            android:enabled="false"/>
 
         <ImageButton
             android:id="@+id/sendButton"
@@ -46,6 +79,7 @@
             android:contentDescription="Enviar"
             android:layout_gravity="center_vertical"
             android:padding="12dp"
+            android:enabled="false"
             app:tint="#005082" />
     </LinearLayout>
 

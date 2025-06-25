@@ -27,6 +27,7 @@ class menuActivity : AppCompatActivity() {
         val chipTareas = findViewById<Chip>(R.id.chip4)
         val chipAyudas = findViewById<Chip>(R.id.chip5)
 
+
         chipRegistrar.setOnClickListener {
             startActivity(Intent(this, RegistroAsistenciaActivity::class.java))
         }
@@ -42,6 +43,8 @@ class menuActivity : AppCompatActivity() {
         chipAyudas.setOnClickListener {
             startActivity(Intent(this, AyudaActivity::class.java))
         }
+
+
 
 
         // === Manejo del BottomNavigationView ===
