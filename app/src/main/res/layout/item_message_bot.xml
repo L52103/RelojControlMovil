@@ -6,7 +6,7 @@
     android:layout_marginStart="8dp"
     android:layout_marginEnd="64dp">
 
-    <!-- Imagen del bot -->
+
     <ImageView
         android:id="@+id/botAvatar"
         android:layout_width="40dp"
@@ -19,7 +19,6 @@
     android:padding="4dp" />
 
 
-    <!-- Mensaje del bot -->
     <TextView
         android:id="@+id/textBotMessage"
         android:layout_width="wrap_content"

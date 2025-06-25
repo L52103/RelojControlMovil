@@ -97,10 +97,10 @@ class AyudaActivity : AppCompatActivity() {
             inputMessage.isEnabled = true
             sendButton.isEnabled = true
 
-            // Bot solicita mensaje personalizado
+
             simularBotRespuesta("Por favor, escribe tu mensaje")
         } else {
-            // Después de escribir el mensaje, bot confirma recepción
+            // Despues de escribir el mensaje, bot confirma recepción
             simularBotRespuesta("✅ Respuesta registrada con éxito, se revisará su caso en la brevedad.")
         }
     }

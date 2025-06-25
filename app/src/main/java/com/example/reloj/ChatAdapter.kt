@@ -70,9 +70,9 @@ class ChatAdapter(private val messages: List<Message>) :
     }
 
     class TypingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Aquí puedes hacer animación o texto de "escribiendo..."
+        // animacion "escribiendo..."
         fun bind() {
-            // Nada extra por ahora
+
         }
     }
 }

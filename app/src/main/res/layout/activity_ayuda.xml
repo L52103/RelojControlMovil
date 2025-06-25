@@ -19,7 +19,6 @@
         android:padding="8dp"
         android:clipToPadding="false" />
 
-    <!-- Opciones de botones (inicialmente visibles) -->
     <LinearLayout
         android:id="@+id/optionsLayout"
         android:layout_width="0dp"

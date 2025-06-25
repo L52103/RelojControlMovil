@@ -9,9 +9,6 @@
     tools:context=".RegistroAsistenciaActivity"
     android:background="#F5F5F5">
 
-    <!-- Imagen centrada arriba -->
-
-    <!-- Botón de Ingreso -->
 
     <ImageView
         android:id="@+id/imageView2"
@@ -41,7 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="32dp" />
 
-    <!-- Botón de Salida -->
+
     <Button
         android:id="@+id/button3"
         android:layout_width="0dp"

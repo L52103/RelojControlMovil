@@ -7,7 +7,7 @@
     android:layout_marginStart="64dp"
     android:layout_marginEnd="8dp">
 
-    <!-- Texto del usuario -->
+
     <TextView
         android:id="@+id/textUserMessage"
         android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
         android:layout_gravity="center_vertical"
         android:text="Mensaje del usuario" />
 
-    <!-- Imagen del usuario -->
+
     <ImageView
         android:id="@+id/userAvatar"
         android:layout_width="40dp"

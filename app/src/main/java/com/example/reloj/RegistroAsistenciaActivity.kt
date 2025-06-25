@@ -55,21 +55,21 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
 
         executor = ContextCompat.getMainExecutor(this)
 
-        // Prompt info para ingreso
+
         promptInfoIngreso = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Verifica tu identidad")
             .setSubtitle("Usa tu huella para registrar tu ingreso")
             .setNegativeButtonText("Cancelar")
             .build()
 
-        // Prompt info para salida
+
         promptInfoSalida = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Verifica tu identidad")
             .setSubtitle("Usa tu huella para registrar tu salida")
             .setNegativeButtonText("Cancelar")
             .build()
 
-        // BiometricPrompt para ingreso
+
         biometricPromptIngreso = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
@@ -83,7 +83,7 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
                     } else if (biometriaHuella == tokenLocal) {
                         runOnUiThread {
                             Toast.makeText(applicationContext, "✅ Ingreso autorizado", Toast.LENGTH_LONG).show()
-                            // Registrar asistencia ingreso aquí
+
                         }
                     } else {
                         runOnUiThread {
@@ -108,13 +108,13 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
             }
         })
 
-        // BiometricPrompt para salida
+
         biometricPromptSalida = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 runOnUiThread {
                     Toast.makeText(applicationContext, "✅ Acción registrada con éxito", Toast.LENGTH_LONG).show()
-                    // Registrar asistencia salida aquí
+
                 }
             }
 
