@@ -27,12 +27,12 @@ data class LoginResponse(
 )
 
 interface ApiService {
-    @POST("Login")
+    @POST("login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 }
 
 object ApiClient {
-    private const val BASE_URL = "https://apilogin.azurewebsites.net/api/"
+    private const val BASE_URL = "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

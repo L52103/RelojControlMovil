@@ -18,8 +18,7 @@ data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val token: String)  // Ajusta según la respuesta de tu API
 
 object ApiClient {
-    // Define la URL base de tu API en Azure. Asegúrate de incluir el "/" al final.
-    private const val BASE_URL = "https://apilogin.azurewebsites.net/api/"
+    private const val BASE_URL = "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
 
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -31,9 +30,8 @@ object ApiClient {
         }
     }
 
-
     suspend fun login(email: String, password: String): LoginResponse {
-        return client.post("${BASE_URL}login") {
+        return client.post("$BASE_URL/login") {
             contentType(ContentType.Application.Json)
             setBody(LoginRequest(email, password))
         }.body<LoginResponse>()
