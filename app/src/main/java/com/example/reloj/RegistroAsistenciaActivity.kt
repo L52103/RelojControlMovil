@@ -1,7 +1,7 @@
 package com.example.reloj
 
 import android.os.Bundle
-import android.util.Base64
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -16,52 +16,56 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
-import java.security.MessageDigest
 import java.util.concurrent.Executor
 
 class RegistroAsistenciaActivity : AppCompatActivity() {
 
-    private lateinit var biometricPromptIngreso: BiometricPrompt
-    private lateinit var biometricPromptSalida: BiometricPrompt
+    private val TAG = "Asistencia"
+
+    private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfoIngreso: BiometricPrompt.PromptInfo
     private lateinit var promptInfoSalida: BiometricPrompt.PromptInfo
     private lateinit var executor: Executor
-    private val apiBaseUrl = "https://apilogin.azurewebsites.net/api/ActualizarBiometria"
-    private val client = OkHttpClient()
 
-    private var rutUsuario: String? = null
-    private var biometriaHuella: String? = null
+    private enum class Tipo { INGRESO, SALIDA }
+    private var currentAction: Tipo? = null
+
+    // API
+    private val asistenciaApiBase =
+        "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
+
+    private val client = OkHttpClient()
+    private var emailUsuario: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.registro_asistencia)
 
+        // EMAIL desde SharedPreferences
         val sharedPref = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
-        rutUsuario = sharedPref.getString("rut", null)
-        biometriaHuella = sharedPref.getString("biometria_huella", null)
+        val emailFromPrefs = sharedPref.getString("EMAIL", null)
+        val emailFromIntent = intent.getStringExtra("EMAIL")
+        emailUsuario = emailFromPrefs ?: emailFromIntent
 
-        if (rutUsuario.isNullOrEmpty()) {
-            Toast.makeText(this, "Usuario no autenticado. Por favor, inicia sesión.", Toast.LENGTH_LONG).show()
-            finish()
-            return
+        if (emailUsuario.isNullOrBlank()) {
+            Toast.makeText(this, "Falta email del trabajador. Inicia sesión nuevamente.", Toast.LENGTH_LONG).show()
+            finish(); return
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+            val s = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(s.left, s.top, s.right, s.bottom); insets
         }
 
         executor = ContextCompat.getMainExecutor(this)
 
-
+        // Prompts separados
         promptInfoIngreso = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Verifica tu identidad")
             .setSubtitle("Usa tu huella para registrar tu ingreso")
             .setNegativeButtonText("Cancelar")
             .build()
-
 
         promptInfoSalida = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Verifica tu identidad")
@@ -69,161 +73,183 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
             .setNegativeButtonText("Cancelar")
             .build()
 
+        // UN solo BiometricPrompt con callback que decide por currentAction
+        biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    val email = emailUsuario!!.trim()
+                    val action = currentAction
+                    Log.d(TAG, "✅ AUTH OK (${action?.name ?: "SIN ACCIÓN"}) para $email")
 
-        biometricPromptIngreso = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "✅ Huella reconocida para ingreso", Toast.LENGTH_SHORT).show()
-                }
-                rutUsuario?.let { rut ->
-                    val tokenLocal = generarTokenDesdeRut(rut)
-                    if (biometriaHuella.isNullOrEmpty()) {
-                        guardarTokenEnApi(rut, tokenLocal)
-                    } else if (biometriaHuella == tokenLocal) {
-                        runOnUiThread {
-                            Toast.makeText(applicationContext, "✅ Ingreso autorizado", Toast.LENGTH_LONG).show()
+                    if (action == null) {
+                        Toast.makeText(applicationContext, "⚠️ Acción no determinada.", Toast.LENGTH_SHORT).show()
+                        return
+                    }
 
+                    when (action) {
+                        Tipo.INGRESO -> {
+                            Toast.makeText(applicationContext, "✅ Huella verificada (Ingreso)", Toast.LENGTH_SHORT).show()
+                            marcarIngresoEnApi(email)
                         }
-                    } else {
-                        runOnUiThread {
-                            Toast.makeText(applicationContext, "❌ Huella no coincide con la registrada", Toast.LENGTH_LONG).show()
+                        Tipo.SALIDA -> {
+                            Toast.makeText(applicationContext, "✅ Huella verificada (Salida)", Toast.LENGTH_SHORT).show()
+                            marcarSalidaEnApi(email)
                         }
                     }
+
+                    // limpiar acción al terminar
+                    currentAction = null
                 }
-            }
 
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "❌ Huella no reconocida para ingreso", Toast.LENGTH_SHORT).show()
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    val action = currentAction
+                    val texto = if (action == Tipo.SALIDA) "Salida" else "Ingreso"
+                    Toast.makeText(applicationContext, "❌ Huella no reconocida ($texto)", Toast.LENGTH_SHORT).show()
                 }
-            }
 
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "⚠️ Error ingreso: $errString", Toast.LENGTH_SHORT).show()
+                override fun onAuthenticationError(code: Int, errString: CharSequence) {
+                    super.onAuthenticationError(code, errString)
+                    val action = currentAction
+                    val texto = if (action == Tipo.SALIDA) "Salida" else "Ingreso"
+                    Toast.makeText(applicationContext, "⚠️ Error $texto: $errString", Toast.LENGTH_SHORT).show()
+                    currentAction = null
                 }
-            }
-        })
+            })
 
-
-        biometricPromptSalida = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "✅ Acción registrada con éxito", Toast.LENGTH_LONG).show()
-
-                }
-            }
-
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "❌ Huella no reconocida para salida", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "⚠️ Error salida: $errString", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-
+        // Botón INGRESO
         val buttonIngreso: Button = findViewById(R.id.button2)
+        // fuerza el texto para evitar confusiones de layout
+        buttonIngreso.text = "Ingreso"
         buttonIngreso.setOnClickListener {
+            currentAction = Tipo.INGRESO
+            Log.d(TAG, "🟢 CLICK BOTÓN INGRESO → currentAction=INGRESO")
             verificarBiometriaIngreso()
         }
 
+        // Botón SALIDA
         val buttonSalida: Button = findViewById(R.id.button3)
+        buttonSalida.text = "Salida"
+        buttonSalida.isEnabled = true
+        buttonSalida.alpha = 1f
         buttonSalida.setOnClickListener {
+            currentAction = Tipo.SALIDA
+            Log.d(TAG, "🔵 CLICK BOTÓN SALIDA → currentAction=SALIDA")
             verificarBiometriaSalida()
         }
     }
 
+    // ---------- Biometría ----------
     private fun verificarBiometriaIngreso() {
-        val biometricManager = BiometricManager.from(this)
-        val puedeAutenticar = biometricManager.canAuthenticate(
+        val bm = BiometricManager.from(this)
+        val can = bm.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL
         )
-
-        when (puedeAutenticar) {
-            BiometricManager.BIOMETRIC_SUCCESS -> biometricPromptIngreso.authenticate(promptInfoIngreso)
+        when (can) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                Log.d(TAG, "Biometría disponible → autenticando (INGRESO)")
+                biometricPrompt.authenticate(promptInfoIngreso)
+            }
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                Toast.makeText(this, "Tu dispositivo no tiene sensor de huella", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Sin sensor de huella", Toast.LENGTH_LONG).show()
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                Toast.makeText(this, "El sensor no está disponible", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Sensor no disponible", Toast.LENGTH_LONG).show()
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
                 Toast.makeText(this, "No hay huellas registradas", Toast.LENGTH_LONG).show()
             else ->
-                Toast.makeText(this, "Autenticación biométrica no disponible", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Biometría no disponible (Ingreso)", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun verificarBiometriaSalida() {
-        val biometricManager = BiometricManager.from(this)
-        val puedeAutenticar = biometricManager.canAuthenticate(
+        val bm = BiometricManager.from(this)
+        val can = bm.canAuthenticate(
             BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL
         )
-
-        when (puedeAutenticar) {
-            BiometricManager.BIOMETRIC_SUCCESS -> biometricPromptSalida.authenticate(promptInfoSalida)
+        when (can) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                Log.d(TAG, "Biometría disponible → autenticando (SALIDA)")
+                biometricPrompt.authenticate(promptInfoSalida)
+            }
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                Toast.makeText(this, "Tu dispositivo no tiene sensor de huella", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Sin sensor de huella", Toast.LENGTH_LONG).show()
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                Toast.makeText(this, "El sensor no está disponible", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Sensor no disponible", Toast.LENGTH_LONG).show()
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
                 Toast.makeText(this, "No hay huellas registradas", Toast.LENGTH_LONG).show()
             else ->
-                Toast.makeText(this, "Autenticación biométrica no disponible", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Biometría no disponible (Salida)", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun generarTokenDesdeRut(rut: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val hash = digest.digest(rut.toByteArray(Charsets.UTF_8))
-        return Base64.encodeToString(hash, Base64.NO_WRAP)
-    }
-
-    private fun limpiarRut(rut: String): String {
-        return rut.replace(".", "").replace("-", "").trim()
-    }
-
-    private fun guardarTokenEnApi(rutOriginal: String, token: String) {
-        val rutLimpio = limpiarRut(rutOriginal)
-        val jsonBody = JSONObject().apply {
-            put("biometria_huella", token)
-        }
-
+    // ---------- API (Ingreso) ----------
+    private fun marcarIngresoEnApi(email: String) {
+        val jsonBody = JSONObject().apply { put("email", email) }
         val body = jsonBody.toString().toRequestBody("application/json".toMediaType())
-        val url = "$apiBaseUrl?rut=$rutLimpio"
+        val url = "$asistenciaApiBase/asistencia/ingreso"
 
-        val request = Request.Builder()
-            .url(url)
-            .put(body)
-            .build()
+        Log.d(TAG, "➡️ POST $url  body=$jsonBody")
 
+        val request = Request.Builder().url(url).post(body).build()
         client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "❌ No se pudo guardar el token: ${e.message}", Toast.LENGTH_LONG).show()
-                }
+            override fun onFailure(call: Call, e: IOException) = runOnUiThread {
+                Log.e(TAG, "❌ FALLÓ ingreso: ${e.message}", e)
+                Toast.makeText(applicationContext, "❌ No se pudo marcar el ingreso: ${e.message}", Toast.LENGTH_LONG).show()
             }
-
             override fun onResponse(call: Call, response: Response) {
+                val status = response.code
+                val resp = response.body?.string()
+                Log.d(TAG, "✅ RESPUESTA ingreso: HTTP $status, body=$resp")
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        val sharedPref = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
-                        sharedPref.edit().putString("biometria_huella", token).apply()
-                        Toast.makeText(applicationContext, "✅ Huella registrada por primera vez", Toast.LENGTH_LONG).show()
+                        val msg = if (status == 201) "✅ Ingreso registrado (nuevo)" else "✅ Ingreso actualizado"
+                        Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
                     } else {
-                        Toast.makeText(applicationContext, "⚠️ Error al guardar token: ${response.code}", Toast.LENGTH_LONG).show()
+                        val msg = if (status == 409)
+                            "⚠️ La asistencia de hoy ya tiene hora de entrada."
+                        else "⚠️ Error al marcar ingreso ($status)"
+                        Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
                     }
                 }
+                response.close()
+            }
+        })
+    }
+
+    // ---------- API (Salida) ----------
+    private fun marcarSalidaEnApi(email: String) {
+        val jsonBody = JSONObject().apply { put("email", email) }
+        val body = jsonBody.toString().toRequestBody("application/json".toMediaType())
+        val url = "$asistenciaApiBase/asistencia/salida"
+
+        Log.d(TAG, "➡️ POST $url  body=$jsonBody")
+
+        val request = Request.Builder().url(url).post(body).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) = runOnUiThread {
+                Log.e(TAG, "❌ FALLÓ salida: ${e.message}", e)
+                Toast.makeText(applicationContext, "❌ No se pudo marcar la salida: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+            override fun onResponse(call: Call, response: Response) {
+                val status = response.code
+                val resp = response.body?.string()
+                Log.d(TAG, "✅ RESPUESTA salida: HTTP $status, body=$resp")
+                runOnUiThread {
+                    if (response.isSuccessful) {
+                        Toast.makeText(applicationContext, "✅ Salida marcada", Toast.LENGTH_LONG).show()
+                    } else {
+                        val msg = when (status) {
+                            404 -> "⚠️ No existe asistencia de hoy para marcar salida."
+                            409 -> "⚠️ La asistencia de hoy ya tiene hora de salida."
+                            else -> "⚠️ Error al marcar salida ($status)"
+                        }
+                        Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
+                    }
+                }
+                response.close()
             }
         })
     }
 }
+

@@ -14,6 +14,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+// --------- MODELOS ---------
+
 data class LoginRequest(
     val email: String,
     val password: String
@@ -24,7 +26,10 @@ data class LoginResponse(
     val rut: String,
     val nombre: String,
     val email: String
+    // Si luego tu API devuelve trabajador_id, añádelo aquí: val trabajador_id: Int?
 )
+
+// --------- API ---------
 
 interface ApiService {
     @POST("login")
@@ -32,7 +37,8 @@ interface ApiService {
 }
 
 object ApiClient {
-    private const val BASE_URL = "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api/"
+    private const val BASE_URL =
+        "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -41,6 +47,8 @@ object ApiClient {
 
     val apiService: ApiService = retrofit.create(ApiService::class.java)
 }
+
+// --------- ACTIVITY ---------
 
 class LoginActivity : AppCompatActivity() {
 
@@ -63,17 +71,22 @@ class LoginActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    val loginRequest = LoginRequest(email, password)
-                    val response = ApiClient.apiService.login(loginRequest)
+                    val response = ApiClient.apiService.login(LoginRequest(email, password))
 
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
                         if (loginResponse != null) {
+
+                            // 🔐 Guardar datos para el resto de la app
                             val sharedPref = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
                             sharedPref.edit().apply {
                                 putString("rut", loginResponse.rut)
                                 putString("nombre", loginResponse.nombre)
-                                putString("email", loginResponse.email)
+                                // Guarda ambas claves por compatibilidad:
+                                putString("EMAIL", loginResponse.email) // <- en MAYÚSCULAS (lo que usa RegistroAsistencia)
+                                putString("email", loginResponse.email) // <- por si otras pantallas usan minúsculas
+                                // Si en el futuro agregas trabajador_id:
+                                // putInt("trabajador_id", loginResponse.trabajador_id ?: -1)
                                 apply()
                             }
 
@@ -83,9 +96,17 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // Aquí se redirige a menuActivity
+                            // ➜ Navega a tu menú principal como ya lo hacías
                             startActivity(Intent(this@LoginActivity, menuActivity::class.java))
                             finish()
+
+                            // (Opcional) Si quisieras abrir directo RegistroAsistenciaActivity y pasar el email por Intent:
+                            /*
+                            val i = Intent(this@LoginActivity, RegistroAsistenciaActivity::class.java)
+                            i.putExtra("EMAIL", loginResponse.email)
+                            startActivity(i)
+                            finish()
+                            */
                         } else {
                             Toast.makeText(this@LoginActivity, "Respuesta vacía", Toast.LENGTH_LONG).show()
                         }
@@ -93,7 +114,11 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity, "Credenciales inválidas", Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(this@LoginActivity, "Error al iniciar sesión: ${e.message ?: "desconocido"}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Error al iniciar sesión: ${e.message ?: "desconocido"}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
