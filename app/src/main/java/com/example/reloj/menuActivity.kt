@@ -24,7 +24,6 @@ class menuActivity : AppCompatActivity() {
         // === Manejo de los Chips ===
         val chipRegistrar = findViewById<Chip>(R.id.chip)
         val chipAsistenciaGeneral = findViewById<Chip>(R.id.chip3)
-        val chipTareas = findViewById<Chip>(R.id.chip4)
         val chipAyudas = findViewById<Chip>(R.id.chip5)
 
 
@@ -36,9 +35,6 @@ class menuActivity : AppCompatActivity() {
             startActivity(Intent(this, AsistenciaGeneralActivity::class.java))
         }
 
-        chipTareas.setOnClickListener {
-            startActivity(Intent(this, TareasActivity::class.java))
-        }
 
         chipAyudas.setOnClickListener {
             startActivity(Intent(this, AyudaActivity::class.java))
@@ -56,10 +52,7 @@ class menuActivity : AppCompatActivity() {
                     startActivity(Intent(this, AsistenciaGeneralActivity::class.java))
                     true
                 }
-                R.id.navigation_tareas -> {
-                    startActivity(Intent(this, TareasActivity::class.java))
-                    true
-                }
+
                 R.id.navigation_ayuda -> {
                     startActivity(Intent(this, AyudaActivity::class.java))
                     true
