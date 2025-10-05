@@ -55,10 +55,10 @@ class AyudaActivity : AppCompatActivity() {
         chatRecyclerView.layoutManager = LinearLayoutManager(this)
         chatRecyclerView.adapter = adapter
 
-        // 1) Leer email por Intent (si lo enviaron)
+        //  Leer email por Intent
         emailIntent = intent.getStringExtra("EMAIL")
 
-        // 2) Fallback: leer email desde SharedPreferences guardado en LoginActivity
+        //  leer email desde SharedPreferences guardado en LoginActivity
         if (emailIntent.isNullOrBlank()) {
             val prefs = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
             emailIntent = prefs.getString("email", null)
@@ -89,7 +89,7 @@ class AyudaActivity : AppCompatActivity() {
         }
     }
 
-    private fun simularBotEscribiendo(onFinish: () -> Unit) {
+    private fun simularBotEscribiendo(onFinish: () -> Unit) { // animacion bot
         agregarMensaje(Message("Bot está escribiendo...", isBot = true, isTyping = true))
         chatRecyclerView.postDelayed({
             quitarUltimoTyping()
@@ -114,7 +114,7 @@ class AyudaActivity : AppCompatActivity() {
             if (emailIntent.isNullOrBlank()) {
                 agregarMensaje(
                     Message(
-                        "⚠️ No hay email del trabajador. Inicia sesión nuevamente.",
+                        " No hay email del trabajador. Inicia sesión nuevamente.",
                         isBot = true
                     )
                 )
@@ -126,7 +126,7 @@ class AyudaActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    // Llamada real al backend usando SOLO email (como en el curl)
+                    // Llamada al backend usando email
                     val resp = withContext(Dispatchers.IO) {
                         ApiClient.enviarMensajeAsistencia(
                             mensaje = texto,
@@ -145,7 +145,7 @@ class AyudaActivity : AppCompatActivity() {
                     quitarTyping(typingIdx)
                     agregarMensaje(
                         Message(
-                            "⚠️ Error de red. ${e.message.orEmpty()}",
+                            "Error de red. ${e.message.orEmpty()}",
                             isBot = true
                         )
                     )
@@ -204,7 +204,7 @@ class AyudaActivity : AppCompatActivity() {
     }
 }
 
-// Modelo simple para el chat
+// clase para el chat
 data class Message(
     val text: String,
     val isBot: Boolean,

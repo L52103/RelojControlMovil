@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-// --------- MODELOS ---------
+
 
 data class LoginRequest(
     val email: String,
@@ -29,11 +29,11 @@ data class LoginResponse(
     // Si luego tu API devuelve trabajador_id, añádelo aquí: val trabajador_id: Int?
 )
 
-// --------- API ---------
+
 
 interface ApiService {
     @POST("login")
-    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse> // POST login
 }
 
 object ApiClient {
@@ -48,20 +48,18 @@ object ApiClient {
     val apiService: ApiService = retrofit.create(ApiService::class.java)
 }
 
-// --------- ACTIVITY ---------
-
 class LoginActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { // captura de vistas
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
 
-        val emailField = findViewById<EditText>(R.id.editTextTextEmailAddress)
+        val emailField = findViewById<EditText>(R.id.editTextTextEmailAddress) // obtiene widgets de layouts
         val passwordField = findViewById<EditText>(R.id.editTextTextPassword)
         val btnLogin = findViewById<Button>(R.id.button)
 
         btnLogin.setOnClickListener {
-            val email = emailField.text.toString().trim()
+            val email = emailField.text.toString().trim() // evita dejar campos vacios
             val password = passwordField.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
@@ -77,15 +75,14 @@ class LoginActivity : AppCompatActivity() {
                         val loginResponse = response.body()
                         if (loginResponse != null) {
 
-                            // 🔐 Guardar datos para el resto de la app
+                            // Guardar datos para el resto de la app
                             val sharedPref = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
                             sharedPref.edit().apply {
                                 putString("rut", loginResponse.rut)
                                 putString("nombre", loginResponse.nombre)
-                                // Guarda ambas claves por compatibilidad:
-                                putString("EMAIL", loginResponse.email) // <- en MAYÚSCULAS (lo que usa RegistroAsistencia)
-                                putString("email", loginResponse.email) // <- por si otras pantallas usan minúsculas
-                                // Si en el futuro agregas trabajador_id:
+                                // Guarda ambas claves por compatibilidad
+                                putString("EMAIL", loginResponse.email) //
+                                putString("email", loginResponse.email) //
                                 // putInt("trabajador_id", loginResponse.trabajador_id ?: -1)
                                 apply()
                             }
@@ -96,17 +93,10 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            // ➜ Navega a tu menú principal como ya lo hacías
+                            // menú principal
                             startActivity(Intent(this@LoginActivity, menuActivity::class.java))
                             finish()
 
-                            // (Opcional) Si quisieras abrir directo RegistroAsistenciaActivity y pasar el email por Intent:
-                            /*
-                            val i = Intent(this@LoginActivity, RegistroAsistenciaActivity::class.java)
-                            i.putExtra("EMAIL", loginResponse.email)
-                            startActivity(i)
-                            finish()
-                            */
                         } else {
                             Toast.makeText(this@LoginActivity, "Respuesta vacía", Toast.LENGTH_LONG).show()
                         }

@@ -10,7 +10,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.reloj.databinding.ActivityTestBinding
 
 class testActivity : AppCompatActivity() {
-
+// conexion con barra de navegacion
     private lateinit var binding: ActivityTestBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

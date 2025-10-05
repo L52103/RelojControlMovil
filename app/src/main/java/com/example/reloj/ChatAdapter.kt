@@ -1,4 +1,4 @@
-package com.example.reloj  // Cambia esto por tu paquete real
+package com.example.reloj
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,7 +70,7 @@ class ChatAdapter(private val messages: List<Message>) :
     }
 
     class TypingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // animacion "escribiendo..."
+        // animacion escribiendo...
         fun bind() {
 
         }

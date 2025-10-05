@@ -19,13 +19,12 @@ import kotlinx.serialization.json.Json
 
 object ApiClient {
 
-    // 🔧 Pon aquí tu URL real de la Function App (SIN barra al final)
+    // URL sin barra al final)
     private const val BASE_URL =
         "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
 
-    // ========== MODELOS ==========
     @Serializable
-    data class LoginRequest(val email: String, val password: String)
+    data class LoginRequest(val email: String, val password: String) // JSON clase login con variables
 
     @Serializable
     data class LoginResponse(
@@ -36,7 +35,7 @@ object ApiClient {
     )
 
     @Serializable
-    data class AsistenciaMensajeRequest(
+    data class AsistenciaMensajeRequest( // JSON para asistencia
         @SerialName("trabajador_id") val trabajadorId: Int? = null,
         val email: String? = null,
         val rut: String? = null,
@@ -68,9 +67,8 @@ object ApiClient {
         val registro: AsistenciaRegistro? = null
     )
 
-    // ========== CLIENTE ==========
     val client = HttpClient(CIO) {
-        expectSuccess = false // no lanzar excepción automática en 4xx/5xx
+        expectSuccess = false // no lanzar excepción automática
 
         install(ContentNegotiation) {
             json(
@@ -87,27 +85,20 @@ object ApiClient {
             connectTimeoutMillis = 10_000
             socketTimeoutMillis = 20_000
         }
-        install(HttpRequestRetry) {
+        install(HttpRequestRetry) { // si el servidor falla, tratará de nuevo
             retryOnServerErrors(maxRetries = 1)
             exponentialDelay()
         }
     }
 
-    // ========== ENDPOINTS ==========
-
-    suspend fun login(email: String, password: String): LoginResponse {
+    suspend fun login(email: String, password: String): LoginResponse { // peticion POST al login
         return client.post("$BASE_URL/login") {
             contentType(ContentType.Application.Json)
             setBody(LoginRequest(email, password))
         }.body()
     }
 
-    /**
-     * Envía el mensaje de justificación y actualiza la ÚLTIMA asistencia del trabajador.
-     * Requiere al menos uno: trabajadorId, email o rut.
-     * Si la respuesta no calza con el modelo, devuelve un AsistenciaMensajeResponse con el texto crudo.
-     */
-    suspend fun enviarMensajeAsistencia(
+    suspend fun enviarMensajeAsistencia( // peticion post Mensaje Asistencia
         mensaje: String,
         trabajadorId: Int? = null,
         email: String? = null,

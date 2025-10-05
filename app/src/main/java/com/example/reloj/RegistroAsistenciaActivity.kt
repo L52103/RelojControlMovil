@@ -31,7 +31,7 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
     private var currentAction: Tipo? = null
 
     // API
-    private val asistenciaApiBase =
+    private val asistenciaApiBase = // Api base
         "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
 
     private val client = OkHttpClient()
@@ -73,27 +73,27 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
             .setNegativeButtonText("Cancelar")
             .build()
 
-        // UN solo BiometricPrompt con callback que decide por currentAction
+        // BiometricPrompt con callback que decide por currentAction
         biometricPrompt = BiometricPrompt(this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     val email = emailUsuario!!.trim()
                     val action = currentAction
-                    Log.d(TAG, "✅ AUTH OK (${action?.name ?: "SIN ACCIÓN"}) para $email")
+                    Log.d(TAG, " AUTH OK (${action?.name ?: "SIN ACCIÓN"}) para $email")
 
                     if (action == null) {
-                        Toast.makeText(applicationContext, "⚠️ Acción no determinada.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, " Acción no determinada.", Toast.LENGTH_SHORT).show()
                         return
                     }
 
                     when (action) {
                         Tipo.INGRESO -> {
-                            Toast.makeText(applicationContext, "✅ Huella verificada (Ingreso)", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(applicationContext, " Huella verificada (Ingreso)", Toast.LENGTH_SHORT).show()
                             marcarIngresoEnApi(email)
                         }
                         Tipo.SALIDA -> {
-                            Toast.makeText(applicationContext, "✅ Huella verificada (Salida)", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(applicationContext, "Huella verificada (Salida)", Toast.LENGTH_SHORT).show()
                             marcarSalidaEnApi(email)
                         }
                     }
@@ -106,25 +106,26 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
                     super.onAuthenticationFailed()
                     val action = currentAction
                     val texto = if (action == Tipo.SALIDA) "Salida" else "Ingreso"
-                    Toast.makeText(applicationContext, "❌ Huella no reconocida ($texto)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, " Huella no reconocida ($texto)", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onAuthenticationError(code: Int, errString: CharSequence) {
                     super.onAuthenticationError(code, errString)
                     val action = currentAction
                     val texto = if (action == Tipo.SALIDA) "Salida" else "Ingreso"
-                    Toast.makeText(applicationContext, "⚠️ Error $texto: $errString", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "️ Error $texto: $errString", Toast.LENGTH_SHORT).show()
                     currentAction = null
                 }
             })
 
         // Botón INGRESO
         val buttonIngreso: Button = findViewById(R.id.button2)
-        // fuerza el texto para evitar confusiones de layout
+
+        // fuerza el texto layout
         buttonIngreso.text = "Ingreso"
         buttonIngreso.setOnClickListener {
             currentAction = Tipo.INGRESO
-            Log.d(TAG, "🟢 CLICK BOTÓN INGRESO → currentAction=INGRESO")
+            Log.d(TAG, " CLICK BOTÓN INGRESO → currentAction=INGRESO")
             verificarBiometriaIngreso()
         }
 
@@ -135,12 +136,12 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
         buttonSalida.alpha = 1f
         buttonSalida.setOnClickListener {
             currentAction = Tipo.SALIDA
-            Log.d(TAG, "🔵 CLICK BOTÓN SALIDA → currentAction=SALIDA")
+            Log.d(TAG, " CLICK BOTÓN SALIDA → currentAction=SALIDA")
             verificarBiometriaSalida()
         }
     }
 
-    // ---------- Biometría ----------
+    //  Biometría
     private fun verificarBiometriaIngreso() {
         val bm = BiometricManager.from(this)
         val can = bm.canAuthenticate(
@@ -183,32 +184,32 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
         }
     }
 
-    // ---------- API (Ingreso) ----------
+    // API (Ingreso)
     private fun marcarIngresoEnApi(email: String) {
         val jsonBody = JSONObject().apply { put("email", email) }
         val body = jsonBody.toString().toRequestBody("application/json".toMediaType())
         val url = "$asistenciaApiBase/asistencia/ingreso"
 
-        Log.d(TAG, "➡️ POST $url  body=$jsonBody")
+        Log.d(TAG, " POST $url  body=$jsonBody")
 
         val request = Request.Builder().url(url).post(body).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) = runOnUiThread {
-                Log.e(TAG, "❌ FALLÓ ingreso: ${e.message}", e)
-                Toast.makeText(applicationContext, "❌ No se pudo marcar el ingreso: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e(TAG, " FALLÓ ingreso: ${e.message}", e)
+                Toast.makeText(applicationContext, " No se pudo marcar el ingreso: ${e.message}", Toast.LENGTH_LONG).show()
             }
             override fun onResponse(call: Call, response: Response) {
                 val status = response.code
                 val resp = response.body?.string()
-                Log.d(TAG, "✅ RESPUESTA ingreso: HTTP $status, body=$resp")
+                Log.d(TAG, " RESPUESTA ingreso: HTTP $status, body=$resp")
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        val msg = if (status == 201) "✅ Ingreso registrado (nuevo)" else "✅ Ingreso actualizado"
+                        val msg = if (status == 201) " Ingreso registrado (nuevo)" else "Ingreso actualizado"
                         Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
                     } else {
                         val msg = if (status == 409)
-                            "⚠️ La asistencia de hoy ya tiene hora de entrada."
-                        else "⚠️ Error al marcar ingreso ($status)"
+                            "️ La asistencia de hoy ya tiene hora de entrada."
+                        else " Error al marcar ingreso ($status)"
                         Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
                     }
                 }
@@ -217,32 +218,32 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
         })
     }
 
-    // ---------- API (Salida) ----------
+    //  API (Salida)
     private fun marcarSalidaEnApi(email: String) {
         val jsonBody = JSONObject().apply { put("email", email) }
         val body = jsonBody.toString().toRequestBody("application/json".toMediaType())
         val url = "$asistenciaApiBase/asistencia/salida"
 
-        Log.d(TAG, "➡️ POST $url  body=$jsonBody")
+        Log.d(TAG, " POST $url  body=$jsonBody")
 
         val request = Request.Builder().url(url).post(body).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) = runOnUiThread {
-                Log.e(TAG, "❌ FALLÓ salida: ${e.message}", e)
-                Toast.makeText(applicationContext, "❌ No se pudo marcar la salida: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e(TAG, " FALLÓ salida: ${e.message}", e)
+                Toast.makeText(applicationContext, " No se pudo marcar la salida: ${e.message}", Toast.LENGTH_LONG).show()
             }
             override fun onResponse(call: Call, response: Response) {
                 val status = response.code
                 val resp = response.body?.string()
-                Log.d(TAG, "✅ RESPUESTA salida: HTTP $status, body=$resp")
+                Log.d(TAG, "RESPUESTA salida: HTTP $status, body=$resp")
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        Toast.makeText(applicationContext, "✅ Salida marcada", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, "Salida marcada", Toast.LENGTH_LONG).show()
                     } else {
                         val msg = when (status) {
-                            404 -> "⚠️ No existe asistencia de hoy para marcar salida."
-                            409 -> "⚠️ La asistencia de hoy ya tiene hora de salida."
-                            else -> "⚠️ Error al marcar salida ($status)"
+                            404 -> "No existe asistencia de hoy para marcar salida."
+                            409 -> "La asistencia de hoy ya tiene hora de salida."
+                            else -> "Error al marcar salida ($status)"
                         }
                         Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
                     }

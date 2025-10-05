@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 class menuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContentView(R.layout.menu)
 
@@ -21,7 +22,7 @@ class menuActivity : AppCompatActivity() {
             insets
         }
 
-        // === Manejo de los Chips ===
+        // Manejo de los Chips
         val chipRegistrar = findViewById<Chip>(R.id.chip)
         val chipAsistenciaGeneral = findViewById<Chip>(R.id.chip3)
         val chipAyudas = findViewById<Chip>(R.id.chip5)
@@ -40,10 +41,7 @@ class menuActivity : AppCompatActivity() {
             startActivity(Intent(this, AyudaActivity::class.java))
         }
 
-
-
-
-        // === Manejo del BottomNavigationView ===
+        //  Manejo del BottomNavigationView
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
 
         navView.setOnItemSelectedListener { item ->

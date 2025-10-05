@@ -17,21 +17,21 @@ import kotlinx.coroutines.launch
 
 class AsistenciaGeneralActivity : AppCompatActivity() {
 
-    private lateinit var binding: AsistenciaGeneralBinding
-    private lateinit var adapter: AsistenciaAdapter
+    private lateinit var binding: AsistenciaGeneralBinding // conecta al xml
+    private lateinit var adapter: AsistenciaAdapter // mostrar registros de asistencia
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = AsistenciaGeneralBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding.root) // muestra contenido
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
-        }
+        } // evita que se superpongan los elementos
 
         // Botón back
         binding.imageButton.setOnClickListener { finish() }
@@ -58,7 +58,7 @@ class AsistenciaGeneralActivity : AppCompatActivity() {
     private fun cargarAsistencias(email: String) {
         lifecycleScope.launch {
             try {
-                val resp = ApiAsistenciaClient.service.listarAsistenciaPorEmail(email)
+                val resp = ApiAsistenciaClient.service.listarAsistenciaPorEmail(email) // consulta a la api
                 if (resp.isSuccessful) {
                     val data: ListadoAsistenciaResponse? = resp.body()
                     val registros: List<AsistenciaRegistro> = data?.registros ?: emptyList()
