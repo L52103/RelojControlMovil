@@ -35,6 +35,7 @@ class RegistroAsistenciaActivity : AppCompatActivity() {
         "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
 
     private val client = OkHttpClient()
+
     private var emailUsuario: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
