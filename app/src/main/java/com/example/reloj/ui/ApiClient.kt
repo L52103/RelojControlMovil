@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 
 object ApiClient {
 
-    // URL sin barra al final)
+    // URL sin barra al final
     private const val BASE_URL =
         "https://miapi-eng9f6fkcbbfcudk.brazilsouth-01.azurewebsites.net/api"
 
@@ -27,7 +27,7 @@ object ApiClient {
     data class LoginRequest(val email: String, val password: String) // JSON clase login con variables
 
     @Serializable
-    data class LoginResponse(
+    data class LoginResponse( // variables usadas en login
         val message: String,
         val rut: String? = null,
         val nombre: String? = null,
@@ -120,7 +120,7 @@ object ApiClient {
         }
         val raw = response.bodyAsText()
 
-        // Intenta parsear; si falla, retorna algo legible en 'message' sin crashear
+        // si falla, retorna algo legible en message
         return try {
             Json {
                 ignoreUnknownKeys = true

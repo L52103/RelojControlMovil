@@ -18,19 +18,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AyudaActivity : AppCompatActivity() {
-
+class AyudaActivity : AppCompatActivity() { // variables del layout
     private lateinit var chatRecyclerView: RecyclerView
     private lateinit var inputMessage: EditText
     private lateinit var sendButton: ImageButton
     private lateinit var option1Button: Button
     private lateinit var option2Button: Button
     private lateinit var optionsLayout: View
-
     private val messages = mutableListOf<Message>()
     private lateinit var adapter: ChatAdapter
-
-    // Usaremos SOLO el email (como en el curl)
     private var emailIntent: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +51,8 @@ class AyudaActivity : AppCompatActivity() {
         chatRecyclerView.layoutManager = LinearLayoutManager(this)
         chatRecyclerView.adapter = adapter
 
-        //  Leer email por Intent
+        //  Leer email
         emailIntent = intent.getStringExtra("EMAIL")
-
         //  leer email desde SharedPreferences guardado en LoginActivity
         if (emailIntent.isNullOrBlank()) {
             val prefs = getSharedPreferences("MiAppPrefs", MODE_PRIVATE)
@@ -98,19 +93,19 @@ class AyudaActivity : AppCompatActivity() {
     }
 
     private fun mostrarOpciones() {
-        optionsLayout.visibility = View.VISIBLE
+        optionsLayout.visibility = View.VISIBLE // variable para cambiar la visibilidad de las opciones
     }
 
     private fun enviarMensajeUsuario(texto: String) {
         agregarMensaje(Message(texto, isBot = false))
 
         if (optionsLayout.visibility == View.VISIBLE) {
-            // Primera interacción: habilita el input libre
+            // habilita el input libre
             optionsLayout.visibility = View.GONE
             setInputEnabled(true)
-            simularBotRespuesta("Por favor, escribe tu mensaje")
+            simularBotRespuesta("Por favor, escribe tu mensaje") // mensaje bot para el usuario
         } else {
-            // Validación: debemos tener EMAIL sí o sí
+            // Validación, debemos tener email
             if (emailIntent.isNullOrBlank()) {
                 agregarMensaje(
                     Message(

@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-data class AsistenciaRegistro( // clase de cada fila de la tabla asistencia de
+data class AsistenciaRegistro( // clase de cada fila de la tabla asistencia
     val id: Int?,
     val fecha: String?,
     val hora_entrada: String?,
@@ -42,7 +42,8 @@ object ApiAsistenciaClient {
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
-        .build()
+        .build() // convierte las respuestas JSON del servidor a objetos Kotlin
 
+    // implementación de la interfaz
     val service: ApiAsistenciaService = retrofit.create(ApiAsistenciaService::class.java)
 }

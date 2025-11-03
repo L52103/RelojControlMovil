@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 class ChatAdapter(private val messages: List<Message>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    companion object {
+    companion object { // definicion de tipos de mensaje
         private const val TYPE_BOT = 0
         private const val TYPE_USER = 1
         private const val TYPE_TYPING = 2
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int { // define quien tiene la animacion de escritura
         val msg = messages[position]
         return when {
             msg.isTyping -> TYPE_TYPING
@@ -23,7 +23,7 @@ class ChatAdapter(private val messages: List<Message>) :
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder { // crea la vista
         return when (viewType) {
             TYPE_BOT -> {
                 val view = LayoutInflater.from(parent.context)
@@ -44,9 +44,9 @@ class ChatAdapter(private val messages: List<Message>) :
         }
     }
 
-    override fun getItemCount(): Int = messages.size
+    override fun getItemCount(): Int = messages.size // define cuantos elementos hay en la lista
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) { // toma el mensaje y realiza animacion
         val msg = messages[position]
         when (holder) {
             is BotViewHolder -> holder.bind(msg)
@@ -56,14 +56,14 @@ class ChatAdapter(private val messages: List<Message>) :
     }
 
     class BotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val textView: TextView = itemView.findViewById(R.id.textBotMessage)
+        private val textView: TextView = itemView.findViewById(R.id.textBotMessage) // como se muestran los mensajes del bot
         fun bind(msg: Message) {
             textView.text = msg.text
         }
     }
 
     class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val textView: TextView = itemView.findViewById(R.id.textUserMessage)
+        private val textView: TextView = itemView.findViewById(R.id.textUserMessage) // muestra como se ven los mensajes del usuario
         fun bind(msg: Message) {
             textView.text = msg.text
         }

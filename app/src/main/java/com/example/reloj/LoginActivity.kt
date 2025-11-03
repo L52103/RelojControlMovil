@@ -26,7 +26,7 @@ data class LoginResponse(
     val rut: String,
     val nombre: String,
     val email: String
-    // Si luego tu API devuelve trabajador_id, añádelo aquí: val trabajador_id: Int?
+
 )
 
 
@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
                                 // Guarda ambas claves por compatibilidad
                                 putString("EMAIL", loginResponse.email) //
                                 putString("email", loginResponse.email) //
-                                // putInt("trabajador_id", loginResponse.trabajador_id ?: -1)
+
                                 apply()
                             }
 
