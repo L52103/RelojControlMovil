@@ -53,5 +53,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="32dp" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499">
+
+        <Button
+            android:id="@+id/btnProblemasAsistencia"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="0.25"
+            android:padding="10dp"
+            android:text="¿Problemas con registrar asistencia?"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
